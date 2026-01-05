@@ -13,11 +13,12 @@ export default function SeatLayout() {
   const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingLock, setLoadingLock] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   const seatMap = useMemo(() => {
     return new Map(data?.seats.map((seat) => [seat.number, seat]) || []);
   }, [data]);
-  
+
   function handleSelect(seat: Seat) {
     if (seat.status !== "FREE") return;
     setSelected(seat);
@@ -82,10 +83,35 @@ export default function SeatLayout() {
     if (!serviceId) {
       return;
     }
-    getService(serviceId).then(setData);
+    getService(serviceId, setPageLoading).then(setData);
   }, [serviceId]);
 
-  if (!data) return null;
+  if (pageLoading) {
+    return (
+      <div className="fixed inset-0 bg-white/60 flex justify-center items-center z-50">
+        <div className="h-10 w-10 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!data?.seats?.length)
+    return (
+      <div className="bg-white rounded-2xl shadow-lg border p-10 text-center max-w-xl w-full mt-16">
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          No seat information available
+        </h2>
+        <p className="text-gray-400 mb-6">
+          Please go back and choose another bus.
+        </p>
+
+        <button
+          onClick={() => navigate("/")}
+          className="rounded-full items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 h-11 cursor-pointer shadow"
+        >
+          ← Back to search
+        </button>
+      </div>
+    );
 
   return (
     <div className="flex justify-center p-6">
@@ -122,7 +148,7 @@ export default function SeatLayout() {
           </div>
         </div>
 
-        {data?.seats?.length ? (
+        {data?.seats?.length && (
           <div className="flex gap-6 md:gap-12">
             <RenderBox
               start={1}
@@ -139,22 +165,6 @@ export default function SeatLayout() {
               onSelect={handleSelect}
               headingText="Upper Deck"
             />
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-lg border p-10 text-center max-w-xl w-full mt-16">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              No seat information available
-            </h2>
-            <p className="text-gray-400 mb-6">
-              Please go back and choose another bus.
-            </p>
-
-            <button
-              onClick={() => navigate("/")}
-              className="rounded-full items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 h-11 cursor-pointer shadow"
-            >
-              ← Back to search
-            </button>
           </div>
         )}
 

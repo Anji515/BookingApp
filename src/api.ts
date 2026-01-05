@@ -10,10 +10,26 @@ export async function searchServices(from: string, to: string, date: string) {
 }
 
 // Get Service
-export async function getService(id: string) {
-  const res = await fetch(`${BASE_URL}/services/${id}`);
-  return res.json();
+export async function getService(
+  id: string,
+  setPageLoading?: (state: boolean) => void
+) {
+  setPageLoading?.(true);
+  try {
+    const res = await fetch(`${BASE_URL}/services/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch service (${res.status})`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("getService error:", err);
+  } finally {
+    setPageLoading?.(false);
+  }
 }
+
 
 // Lock Seat
 export async function lockSeat(serviceId: string, seatId: string) {
