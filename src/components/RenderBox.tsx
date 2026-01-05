@@ -23,8 +23,6 @@ export default function RenderBox({
     start + i * 3 + 1,
     start + i * 3 + 2,
   ]);
-  console.log('rows', rows);
-  
 
   return (
     <div className="bg-emerald-50 pl-3 pr-5 py-4 md:p-6 rounded-2xl shadow border flex flex-col gap-4">

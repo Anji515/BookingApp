@@ -41,7 +41,6 @@ export default function SeatLayout() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error("Lock seat failed:", err);
       alert(err.message || "Something went wrong while locking the seat.");
     } finally {
       const updated = await getService(serviceId);
@@ -72,7 +71,6 @@ export default function SeatLayout() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error("Booking failed:", err);
       alert(err.message || "Something went wrong while booking the seat.");
     } finally {
       setLoading(false);
