@@ -92,7 +92,7 @@ export default function SeatLayout() {
     );
   }
 
-  if (!data?.seats?.length)
+  if (!data?.seats?.length && !pageLoading)
     return (
       <div className="bg-white rounded-2xl shadow-lg border p-10 text-center max-w-xl w-full mt-16">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">
@@ -122,9 +122,9 @@ export default function SeatLayout() {
         </button>
 
         <div className="text-center mb-4 space-y-1">
-          <h2 className="text-xl font-semibold">{data.name}</h2>
+          <h2 className="text-xl font-semibold">{data?.name}</h2>
 
-          {data.departureTime && (
+          {data?.departureTime && (
             <div className="text-sm text-gray-600">
               <strong>Start at :</strong> {data.departureTime} hrs
             </div>
