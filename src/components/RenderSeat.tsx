@@ -13,7 +13,7 @@ export default function RenderSeat({ seat, isSelected, onSelect }: SeatProps) {
     <div
       onClick={() => onSelect(seat)}
       className={`
-        h-14 w-8 md:h-16 md:w-10 rounded-xl border-2 flex items-center justify-center text-sm font-semibold transition-all duration-200 relative
+        h-12 w-7 md:h-16 md:w-10 rounded-xl border-2 flex items-center justify-center text-xs md:text-sm font-semibold transition-all duration-200 relative
         ${
           seat.status === "FREE"
             ? "border-green-500 bg-white cursor-pointer hover:scale-105 hover:shadow-md"
@@ -26,7 +26,7 @@ export default function RenderSeat({ seat, isSelected, onSelect }: SeatProps) {
     >
       {seat.number}
       {seat.status === "LOCKED" && (
-        <div className="absolute top-0 right-0 w-0 h-0 border-t-12 border-t-yellow-400 border-l-12 border-l-transparent rounded-tr-xl" />
+        <div className="absolute top-0 right-0 w-0 h-0 border-t-14 border-t-yellow-300 border-l-14 border-l-transparent rounded-tr-[10px]" />
       )}
     </div>
   );

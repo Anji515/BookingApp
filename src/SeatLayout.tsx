@@ -8,26 +8,16 @@ export default function SeatLayout() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const serviceId = params.get("serviceId");
-
   const [data, setData] = useState<Service | null>(null);
   const [selected, setSelected] = useState<Seat | null>(null);
   const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingLock, setLoadingLock] = useState(false);
 
-  useEffect(() => {
-    if (!serviceId) {
-      return;
-    }
-    getService(serviceId).then(setData);
-  }, [serviceId]);
-
   const seatMap = useMemo(() => {
     return new Map(data?.seats.map((seat) => [seat.number, seat]) || []);
   }, [data]);
-
-  if (!data) return null;
-
+  
   function handleSelect(seat: Seat) {
     if (seat.status !== "FREE") return;
     setSelected(seat);
@@ -45,7 +35,6 @@ export default function SeatLayout() {
         throw new Error(body.message || "Unable to lock seat");
       }
       const updated = await getService(serviceId);
-
       setLocked(true);
       setData(updated);
 
@@ -89,11 +78,20 @@ export default function SeatLayout() {
     }
   }
 
+  useEffect(() => {
+    if (!serviceId) {
+      return;
+    }
+    getService(serviceId).then(setData);
+  }, [serviceId]);
+
+  if (!data) return null;
+
   return (
     <div className="flex justify-center p-6">
       <div>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="text-blue-600 mb-2 hover:underline"
         >
           ← Back
@@ -131,23 +129,37 @@ export default function SeatLayout() {
               seatMap={seatMap}
               selected={selected}
               onSelect={handleSelect}
+              headingText="Lower Deck"
+              iconReq
             />
             <RenderBox
               start={19}
               seatMap={seatMap}
               selected={selected}
               onSelect={handleSelect}
+              headingText="Upper Deck"
             />
           </div>
         ) : (
-          <div className="border border-gray-200 rounded-lg text-center w-full m-auto h-96 flex flex-col justify-center items-center px-10 md:px-40">
-            <p className="text-red-600 text-xl. font-semibold">No data</p>
-            <p className="w-60">Go back to select service</p>
+          <div className="bg-white rounded-2xl shadow-lg border p-10 text-center max-w-xl w-full mt-16">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              No seat information available
+            </h2>
+            <p className="text-gray-400 mb-6">
+              Please go back and choose another bus.
+            </p>
+
+            <button
+              onClick={() => navigate("/")}
+              className="rounded-full items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 h-11 cursor-pointer shadow"
+            >
+              ← Back to search
+            </button>
           </div>
         )}
 
         {selected && (
-          <div className="bg-white p-4 rounded-xl shadow mt-6 text-center">
+          <div className="bg-white p-3 rounded-xl shadow mt-6 text-center">
             <div className="mb-2 font-medium">
               Selected Seat: {selected.number}
             </div>
@@ -155,7 +167,7 @@ export default function SeatLayout() {
             {!locked && (
               <button
                 onClick={handleProceed}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-1 rounded-lg"
               >
                 {loadingLock ? "Processing..." : "Proceed"}
               </button>
@@ -164,7 +176,7 @@ export default function SeatLayout() {
             {locked && (
               <button
                 onClick={handleConfirm}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-1 rounded-lg"
               >
                 {loading ? "Confirming" : "Confirm Booking"}
               </button>

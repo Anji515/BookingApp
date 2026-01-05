@@ -13,9 +13,11 @@ export interface Service {
 export default function ServiceList({
   services,
   onSelect,
+  handleClear
 }: {
   services: Service[];
   onSelect: (service: Service) => void;
+  handleClear: () => void; 
 }) {
   return (
     <div className="max-w-225 mx-auto p-6 md:px-0">
@@ -40,6 +42,12 @@ export default function ServiceList({
           </div>
         </div>
       ))}
+      <button
+          onClick={handleClear}
+          className="bg-red-400 text-white rounded-full p-3 px-6 mt-5 cursor-pointer hover:bg-red-300"
+        >
+          Clear Search
+        </button>
     </div>
   );
 }

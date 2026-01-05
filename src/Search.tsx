@@ -1,26 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { searchServices } from "./api";
 import type { Service } from "./ServiceList";
 
 const LOCATIONS = ["BLR", "HYD"];
 
 export default function Search({
+  from,
+  to,
+  date,
+  onSearch,
   onResults,
 }: {
+  from: string;
+  to: string;
+  date: string;
+  onSearch: (v: { from: string; to: string; date: string }) => void;
   onResults: (data: Service[]) => void;
 }) {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [date, setDate] = useState("");
+  const [locationFrom, setLocationFrom] = useState(from);
+  const [locationTo, setLocationTo] = useState(to);
+  const [localDate, setLocalDate] = useState(date);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setLocationFrom(from);
+    setLocationTo(to);
+    setLocalDate(date);
+  }, [from, to, date]);
+
   async function handleSearch() {
-    if (!from || !to || !date) {
+    if (!locationFrom || !locationTo || !localDate) {
       setError("Please select From, To and Date");
       return;
     }
-    if (from === to) {
+    if (locationFrom === locationTo) {
       setError("From and To cannot be the same");
       return;
     }
@@ -29,12 +43,12 @@ export default function Search({
     setLoading(true);
 
     try {
-      const res = await searchServices(from, to, date);
+      onSearch({ from: locationFrom, to: locationTo, date: localDate });
+      const res = await searchServices(locationFrom, locationTo, localDate);
       onResults(res);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to fetch services. Please try again.");
+      setError(err.message || "Failed to fetch services");
       onResults([]);
     } finally {
       setLoading(false);
@@ -43,66 +57,58 @@ export default function Search({
 
   return (
     <div className="bg-white p-6 md:p-10">
-      <h1 className="text-center text-red-500 text-xl font-semibold">Choose Service</h1>
-    <div className="bg-white rounded-xl mb-4 grid grid-cols-1 gap-5 md:grid-cols-4 justify-center items-center my-6 md:m-6">
-      <select
-        className="border border-gray-300 rounded-md px-1 h-10 text-sm"
-        value={from}
-        onChange={(e) => {
-          setFrom(e.target.value);
-          setError(null);
-        }}
-      >
-        <option value="">From</option>
-        {LOCATIONS.map((loc) => (
-          <option key={loc} value={loc}>
-            {loc}
-          </option>
-        ))}
-      </select>
+      <h1 className="text-center text-blue-500 text-2xl pb-2 md:pb-4 font-semibold">
+        Find Buses
+      </h1>
 
-      <select
-        className="border border-gray-300 rounded-md px-1 h-10 text-sm"
-        value={to}
-        onChange={(e) => {
-          setTo(e.target.value);
-          setError(null);
-        }}
-      >
-        <option value="">To</option>
-        {LOCATIONS.map((loc) => (
-          <option key={loc} value={loc} disabled={loc === from}>
-            {loc}
-          </option>
-        ))}
-      </select>
+      <div className="bg-white rounded-xl grid grid-cols-1 gap-5 md:grid-cols-4 my-6">
+        <select
+          className="border rounded-md h-10 px-2"
+          value={locationFrom}
+          onChange={(e) => setLocationFrom(e.target.value)}
+        >
+          <option value="">From</option>
+          {LOCATIONS.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
 
-      <input
-        type="date"
-        className="border border-gray-300 rounded-md px-1 h-10 text-sm"
-        value={date}
-        onChange={(e) => {
-          setDate(e.target.value);
-          setError(null);
-        }}
-      />
+        <select
+          className="border rounded-md h-10 px-2"
+          value={locationTo}
+          onChange={(e) => setLocationTo(e.target.value)}
+        >
+          <option value="">To</option>
+          {LOCATIONS.map((l) => (
+            <option key={l} value={l} disabled={l === locationFrom}>
+              {l}
+            </option>
+          ))}
+        </select>
 
-      <button
-        onClick={handleSearch}
-        disabled={loading}
-        className={`rounded-full h-11 mt-2 md:mt-0 cursor-pointer text-white ${
-          loading
-            ? "bg-blue-300 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? "Searching..." : "Search"}
-      </button>
+        <input
+          type="date"
+          className="border rounded-md h-10 px-2"
+          value={localDate}
+          onChange={(e) => setLocalDate(e.target.value)}
+        />
 
-      {error && (
-        <div className="md:col-span-4 text-red-600 text-sm mt-2">{error}</div>
-      )}
-    </div>
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className={`rounded-full h-11 cursor-pointer text-white ${
+            loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loading ? "Searching..." : "Search Buses"}
+        </button>
+
+        {error && (
+          <div className="md:col-span-4 text-red-600 text-sm">{error}</div>
+        )}
+      </div>
     </div>
   );
 }
