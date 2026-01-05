@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { searchServices } from "./api";
 import type { Service } from "./ServiceList";
-
 const LOCATIONS = ["BLR", "HYD"];
 
 export default function Search({
@@ -10,28 +9,39 @@ export default function Search({
   date,
   onSearch,
   onResults,
+  handleClearSearch,
+  showNoResultClear,
+  showClearOnList,
 }: {
   from: string;
   to: string;
   date: string;
   onSearch: (v: { from: string; to: string; date: string }) => void;
   onResults: (data: Service[]) => void;
+  handleClearSearch: () => void;
+  showNoResultClear: boolean;
+  showClearOnList: boolean;
 }) {
+  const today = new Date().toISOString().split("T")[0];
   const [locationFrom, setLocationFrom] = useState(from);
   const [locationTo, setLocationTo] = useState(to);
-  const [localDate, setLocalDate] = useState(date);
+  const [localDate, setLocalDate] = useState(date || today);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLocationFrom(from);
     setLocationTo(to);
-    setLocalDate(date);
-  }, [from, to, date]);
+    if (date) {
+      setLocalDate(date);
+    } else {
+      setLocalDate(today);
+    }
+  }, [from, to, date, today]);
 
   async function handleSearch() {
-    if (!locationFrom || !locationTo || !localDate) {
-      setError("Please select From, To and Date");
+    if (!locationFrom || !locationTo) {
+      setError("Please select From and To ");
       return;
     }
     if (locationFrom === locationTo) {
@@ -46,7 +56,7 @@ export default function Search({
       onSearch({ from: locationFrom, to: locationTo, date: localDate });
       const res = await searchServices(locationFrom, locationTo, localDate);
       onResults(res);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || "Failed to fetch services");
       onResults([]);
@@ -92,6 +102,7 @@ export default function Search({
           type="date"
           className="border rounded-md h-10 px-2"
           value={localDate}
+          min={today}
           onChange={(e) => setLocalDate(e.target.value)}
         />
 
@@ -109,6 +120,16 @@ export default function Search({
           <div className="md:col-span-4 text-red-600 text-sm">{error}</div>
         )}
       </div>
+      {(showNoResultClear || showClearOnList) && (
+        <div className="h-10">
+          <button
+            onClick={handleClearSearch}
+            className="bg-red-400 text-white rounded-full py-2 px-6 mt-1 cursor-pointer hover:bg-red-300 flex float-end"
+          >
+            Clear Search
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-export function NoResults({ handleClear }: { handleClear: () => void }) {
+export function NoResults() {
   return (
     <div className="flex flex-col items-center justify-center mt-10 md:mt-24 text-center">
       <div className="relative">
@@ -19,12 +19,6 @@ export function NoResults({ handleClear }: { handleClear: () => void }) {
         Try another date between <strong>10th to 12th Jan</strong> or{" "}
         <strong>destination</strong>.
       </p>
-      <button
-        onClick={handleClear}
-        className="bg-red-400 text-white rounded-full p-3 px-6 mt-3 md:mt-10 cursor-pointer hover:bg-red-300"
-      >
-        Clear Search
-      </button>
     </div>
   );
 }

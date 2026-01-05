@@ -16,6 +16,7 @@ export default function AppRoutes() {
   const from = params.get("from") || "";
   const to = params.get("to") || "";
   const date = params.get("date") || "";
+  
   const hasSearched = Boolean(from && to && date);
 
   const handleClearSearch = () => {
@@ -62,6 +63,9 @@ export default function AppRoutes() {
                 date={date}
                 onSearch={(values) => setParams(values)}
                 onResults={setServices}
+                handleClearSearch={handleClearSearch}
+                showNoResultClear={hasSearched && !services.length && !loading}
+                showClearOnList={!!services.length && !loading}
               />
               {loading && (
                 <div className="fixed inset-0 bg-white/60 flex justify-center items-center z-50">
@@ -70,7 +74,7 @@ export default function AppRoutes() {
               )}
               {!hasSearched && !loading && !services.length && <HeroSection />}
               {hasSearched && !services.length && !loading && (
-                <NoResults handleClear={() => navigate("/")} />
+                <NoResults />
               )}
               {!!services.length && (
                 <ServiceList
@@ -78,7 +82,6 @@ export default function AppRoutes() {
                   onSelect={(service) =>
                     navigate(`/seats?serviceId=${service._id}`)
                   }
-                  handleClear={handleClearSearch}
                 />
               )}
             </>
